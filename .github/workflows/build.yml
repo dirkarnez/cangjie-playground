@@ -1,0 +1,41 @@
+name: cangjie-build-actions-workflow
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      
+permissions:
+    contents: write
+    
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest] # , ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - run: |
+          cd /d "%USERPROFILE%\Downloads" &&^
+          curl "https://cangjie-lang.cn/v1/files/auth/downLoad?nsId=142267&fileName=cangjie-sdk-windows-x64-1.0.1.zip&objectKey=68a6780fd1b22272d50f15ee" --output "cangjie-sdk-windows-x64-1.0.1.zip" &&^
+          7z.exe x cangjie-sdk-windows-x64-1.0.1.zip -o"cangjie-sdk-windows-x64-1.0.1" &&^
+          dir
+          
+      - run: |
+          .\local-build.cmd
+      
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          path: main*
+          filename: "${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
+          
+      - name: Release prebuilt
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
