@@ -33,9 +33,8 @@ jobs:
         with:
           type: 'zip'
           path: |
-            main*
+            main.exe
             *.dll
-          exclusions: '*.cj*'
           filename: "${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
           
       - name: Release prebuilt
