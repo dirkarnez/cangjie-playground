@@ -32,7 +32,10 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          path: main*
+          path: |
+            main*
+            *.dll
+          exclusions: '*.cj*'
           filename: "${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.os }}.zip"
           
       - name: Release prebuilt
